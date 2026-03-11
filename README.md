@@ -67,4 +67,12 @@ Libraries and Version Numbers: R version 4.4.2, Rcpp 1.0.14, RcppArmadillo 14.2.
 
 * The R script "Simu_Data_Generate.R" generates the simulated datasets for Scenario II, and "Select_Partial_Data.R" selects partial data to create the sub-scenarios II(a), II(b), and II(c) in the additional simulation studies. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function. "SGD_Functions.R" provides the R functions used for SGD, and "SGD_Main_Conservative.R" contains the main SGD function for the proposed conservative policy optimization.
 
-* The R data files "SGD_Results_Alpha.RData", "SGD_Results_Kappa.RData", and "SGD_Results_Sigma.RData" save the SGD results under different choices of the hyperparameters alpha, kappa, and sigma in the proposed policy optimization algorithm, respectively.
+* The R data files "SGD_Results_Alpha.RData", "SGD_Results_Kappa.RData", and "SGD_Results_Sigma.RData" save the SGD results under different choices of the hyperparameters alpha, kappa, and sigma in the proposed policy optimization method, respectively.
+
+**In the folder "Bayes_ITR_Supplement_E4":**
+
+* The R script "Supplement_E4_Main.R" reproduces the additional simulation studies in Supplementary Material Section E4, including Figure E5 in the supplementary material.
+
+* The R script "Simu_Data_Generate.R" generates the simulated datasets for Scenario II, and "Select_Partial_Data.R" selects partial data to create the sub-scenarios II(a), II(b), II(c), and II(d) in the additional simulation studies. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function. "SGD_Functions.R" provides the R functions used for SGD, while "SGD_Main_Conservative.R" and "SGD_Main_Conservative_Mean.R" contain the main SGD functions for the proposed and alternative conservative policy optimization methods, respectively.
+
+* The R data files "SGD_Results_II(a).RData", "SGD_Results_II(b).RData", "SGD_Results_II(c).RData", and "SGD_Results_II(d).RData" save the SGD results for sub-scenarios II(a), II(b), II(c), and II(d), respectively.
