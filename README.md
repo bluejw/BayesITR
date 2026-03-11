@@ -27,5 +27,6 @@ In the folder "Bayes_ITR_Simulation_Scenario_II":
 
 * The R script "Simu_Data_Generate.R" generates the simulated datasets for Scenario II, and "Select_Partial_Data.R" selects partial data to create the sub-scenarios II(a), II(b), and II(c). "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function. "SGD_Functions.R" provides the R functions used for SGD, while "SGD_Main_Conservative.R" and "SGD_Main_Expected.R" contain the main SGD functions for the proposed conservative policy optimization and the alternative non-conservative policy optimization, respectively.
 
-*
+* The R data files "SGD_Results_II(a).RData", "SGD_Results_II(b).RData", and "SGD_Results_II(c).RData" save the SGD results for Scenarios II(a), II(b), and II(c), respectively.
+
 
