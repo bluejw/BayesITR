@@ -21,7 +21,7 @@ Libraries and Version Numbers: R version 4.4.2, Rcpp 1.0.14, RcppArmadillo 14.2.
 
 * The R data files "MCMC_Results_I(a)_Mode1.RData" and "MCMC_Results_I(a)_Mode2.RData" save the MCMC posterior samples for the two modes under Scenario I(a), while "MCMC_Results_I(b)_Mode1.RData" and "MCMC_Results_I(b)_Mode2.RData" save the MCMC posterior samples for the two modes under Scenario I(b).
 
-In the folder "Bayes_ITR_Simulation_Scenario_II": 
+**In the folder "Bayes_ITR_Simulation_Scenario_II":**
 
 * The R script “Simu_Main.R” reproduces Simulation Study Scenario II in Section 5, including Figure 4 in the manuscript and Figure S5 in the supplementary material.
 
@@ -29,7 +29,7 @@ In the folder "Bayes_ITR_Simulation_Scenario_II":
 
 * The R data files "SGD_Results_II(a).RData", "SGD_Results_II(b).RData", and "SGD_Results_II(c).RData" save the SGD results for Scenarios II(a), II(b), and II(c), respectively.
 
-In the folder "Bayes_ITR_DIVAT":
+**In the folder "Bayes_ITR_DIVAT":**
 
 * The R script "DIVAT_Main.R" reproduces the DIVAT data analysis in Section 6, including Figure 5 and Table 1 in the manuscript and Figure S6 in the supplementary material.
 
@@ -37,7 +37,7 @@ In the folder "Bayes_ITR_DIVAT":
 
 * The R data file "DIVAT_Data.RData" saves the DIVAT dataset for analysis, while "MCMC_Results.RData" and "MCMC_Results_NoUC.RData" save the MCMC posterior samples for the proposed method and the alternative "NoUC" method, respectively.
 
-In the folder "Bayes_ITR_Supplement_C":
+**In the folder "Bayes_ITR_Supplement_C":**
 
 * The R script "Supplement_C_Main.R" reproduces the additional simulation studies in Supplementary Material Section C, including Figure C1 and Figure S2 in the supplementary material.
 
@@ -45,6 +45,6 @@ In the folder "Bayes_ITR_Supplement_C":
 
 * The R data files "MCMC_Results_B0=3.RData" through "MCMC_Results_B0=10.RData" save the MCMC posterior samples under different degrees of freedom, ranging from B0=3 to B0=10, and "ELPD_Values.RData" saves the corresponding elpd values for all scenarios.
 
-In the folder "Bayes_ITR_Supplement_E1":
+**In the folder "Bayes_ITR_Supplement_E1":**
 
 
