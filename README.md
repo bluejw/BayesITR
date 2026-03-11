@@ -37,6 +37,14 @@ In the folder "Bayes_ITR_DIVAT":
 
 * The R data file "DIVAT_Data.RData" saves the DIVAT dataset for analysis, while "MCMC_Results.RData" and "MCMC_Results_NoUC.RData" save the MCMC posterior samples for the proposed method and the alternative "NoUC" method, respectively.
 
-In the folder 
+In the folder "Bayes_ITR_Supplement_C":
+
+* The R script "Supplement_C_Main.R" reproduces the additional simulation studies in Supplementary Material Section C, including Figure C1 and Figure S2 in the supplementary material.
+
+* The R script "Simu_Data_Generate.R" generates the simulated datasets for Supplementary Material Section C. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function.
+
+* The R data files "MCMC_Results_B0=3.RData" through "MCMC_Results_B0=10.RData" save the MCMC posterior samples under different degrees of freedom, ranging from B0=3 to B0=10, and "ELPD_Values.RData" saves the corresponding elpd values for all scenarios.
+
+In the folder "Bayes_ITR_Supplement_E1":
 
 
