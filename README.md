@@ -13,7 +13,7 @@ Libraries and Version Numbers: R version 4.4.2, Rcpp 1.0.14, RcppArmadillo 14.2.
 
 ### Instructions for Use
 
-In the folder "Bayes_ITR_Simulation_Scenario_I": 
+**In the folder "Bayes_ITR_Simulation_Scenario_I":**
 
 * The R script "Simu_Main.R" reproduces Simulation Study Scenario I in Section 5, including Figure 3 in the manuscript and Figures S1, S3, and S4 in the supplementary material.
 
