@@ -7,5 +7,5 @@ The data analyzed in Section 6 "Application: DIVAT Data Analysis" of the paper a
 
 ## Code 
 
-The R scripts in the folders "Bayes_ITR_Simulation_Scenario_I" and "Bayes_ITR_Simulation_Scenario_II" are for Section 5 "Simulation Study", the R scripts in the folder "Bayes_ITR_DIVAT" are for Section 6 "Application: DIVAT Data Analysis", the R scripts in the folders "Bayes_ITR_Supplement_C", "Bayes_ITR_Supplement_E1", "Bayes_ITR_Supplement_E2", "Bayes_ITR_Supplement_E3", and "Bayes_ITR_Supplement_E4" are for the additional simulation studies and sensitivity analyses reported in Supplementary Material Sections C and E1–E4.
+The R scripts in the folders "Bayes_ITR_Simulation_Scenario_I" and "Bayes_ITR_Simulation_Scenario_II" are for Section 5 "Simulation Study", the R scripts in the folder "Bayes_ITR_DIVAT" are for Section 6 "Application: DIVAT Data Analysis", the R scripts in the folders "Bayes_ITR_Supplement_C", "Bayes_ITR_Supplement_E1", "Bayes_ITR_Supplement_E2", "Bayes_ITR_Supplement_E3", and "Bayes_ITR_Supplement_E4" are for the additional simulation studies reported in Supplementary Material Sections C and E1–E4.
 
