@@ -16,3 +16,9 @@ Libraries and Version Numbers: R version 4.4.2, Rcpp 1.0.14, RcppArmadillo 14.2.
 In the folder "Bayes_ITR_Simulation_Scenario_I": 
 
 * The R script "Simu_Main.R" reproduces Simulation Study Scenario I in Section 5, including Figure 3 in the manuscript and Figures S1, S3, and S4 in the supplementary material.
+
+* The R scripts "Simu_Data_Generate_I(a).R" and "Simu_Data_Generate_I(b).R" generate the simulated datasets for Scenarios I(a) and I(b), respectively. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function.
+
+* The R data files "MCMC_Results_I(a)_Mode1.RData" and "MCMC_Results_I(a)_Mode2.RData" save the MCMC posterior samples for the two modes under Scenario I(a), while "MCMC_Results_I(b)_Mode1.RData" and "MCMC_Results_I(b)_Mode2.RData" save the MCMC posterior samples for the two modes under Scenario I(b).
+
+
