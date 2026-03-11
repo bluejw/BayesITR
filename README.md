@@ -67,4 +67,4 @@ Libraries and Version Numbers: R version 4.4.2, Rcpp 1.0.14, RcppArmadillo 14.2.
 
 * The R script "Simu_Data_Generate.R" generates the simulated datasets for Scenario II, and "Select_Partial_Data.R" selects partial data to create the sub-scenarios II(a), II(b), and II(c) in the additional simulation studies. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function. "SGD_Functions.R" provides the R functions used for SGD, and "SGD_Main_Conservative.R" contains the main SGD function for the proposed conservative policy optimization.
 
-
+* The R data files "SGD_Results_Alpha.RData", "SGD_Results_Kappa.RData", and "SGD_Results_Sigma.RData" save the SGD results under different choices of the hyperparameters alpha, kappa, and sigma in the proposed policy optimization algorithm, respectively.
