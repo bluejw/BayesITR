@@ -29,4 +29,14 @@ In the folder "Bayes_ITR_Simulation_Scenario_II":
 
 * The R data files "SGD_Results_II(a).RData", "SGD_Results_II(b).RData", and "SGD_Results_II(c).RData" save the SGD results for Scenarios II(a), II(b), and II(c), respectively.
 
+In the folder "Bayes_ITR_DIVAT":
+
+* The R script "DIVAT_Main.R" reproduces the DIVAT data analysis in Section 6, including Figure 5 and Table 1 in the manuscript and Figure S6 in the supplementary material.
+
+* The R script "Data_Process.R" processes the DIVAT data for analysis. "MCMC_R_Functions.R" provides the R functions used for MCMC, "MCMC_Rcpp_Functions.cpp" provides the corresponding Rcpp functions, and "MCMC_Main.R" contains the main MCMC function.
+
+* The R data file "DIVAT_Data.RData" saves the DIVAT dataset for analysis, while "MCMC_Results.RData" and "MCMC_Results_NoUC.RData" save the MCMC posterior samples for the proposed method and the alternative "NoUC" method, respectively.
+
+In the folder 
+
 
