@@ -1,5 +1,5 @@
 # BayesITR
-R data and code for the paper: "Robust Bayesian Learning for Individualized Treatment Rules Under Unmeasured Confounding".
+R data and code for the paper: "Robust Bayesian Learning for Individualized Treatment Rules Under Unmeasured Confounding". Because GitHub does not support large data files, we have uploaded those files to Google Drive. The corresponding link is provided in the Data section below.
 
 ## Data
 
