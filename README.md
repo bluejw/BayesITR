@@ -3,7 +3,20 @@ R data and code for the paper: "Robust Bayesian Learning for Individualized Trea
 
 ## Data
 
-The data analyzed in Section 6 "Application: DIVAT Data Analysis" of the paper are from The French Computerized and Validated Data in Transplantation (DIVAT), which is a large-scale database that collects medical records for kidney transplantation at several French hospitals. The data are publicly available. However, one needs to fill out a request form for access. Full details of the data are available at https://www.divat.fr/. The R data files for the simulation studies and the DIVAT data analysis of the paper are available at the following link: https://drive.google.com/file/d/1ctH0AXDrb596skbTCQy9F0mbGGJbJz0L/view?usp=sharing.
+The data analyzed in Section 6 "Application: DIVAT Data Analysis" of the paper are from the French Computerized and Validated Data in Transplantation (DIVAT), which is a large-scale database that collects medical records for kidney transplantation at several French hospitals. The data are publicly available. However, one needs to fill out a request form for access. Full details of the data are available at https://www.divat.fr/. 
+
+To facilitate broader accessibility and future use, we have also provided a de-identified dataset from the DIVAT database that was used in the data application presented in Section 6 of the manuscript. We have made the dataset available in two formats: an R data file, "DIVAT_Data.RData", and a CSV file, "DIVAT_Data.csv". Both files are included in the following folder: "Bayes_ITR_DIVAT", and contain the following 8 columns/variables:
+
+* ID: De-identified individual identification number from the DIVAT database;
+* ageR: Recipient age;
+* bmiR: Recipient body mass index (BMI);
+* ageD: Donor age;
+* DGF: Delayed graft function, defined as an indicator of dialysis use within the first week after transplantation (DGF = 0 for no dialysis and DGF = 1 for dialysis); 
+* typeDonor: Donor type, where typeDonor = 0 indicates a living donor and typeDonor = 1 indicates donation after brain death with a beating heart; 
+* creat: Creatinine level (outcome); 
+* tacro_tl: Tacrolimus dosage (treatment).
+
+All other R data files for the simulation studies and the DIVAT data analysis of the paper are available at the following Google Drive link: https://drive.google.com/file/d/1ctH0AXDrb596skbTCQy9F0mbGGJbJz0L/view?usp=sharing.
 
 ## Code 
 
