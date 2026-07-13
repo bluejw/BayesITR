@@ -107,6 +107,14 @@ for (seed_index in 1:num_seed){
   source('SGD_Functions.R')
   
   q_function_expected <- function(a, x, phi, sample_phi=F){
+    
+    # Calculate the expected Q-value (Q-learning).
+    # Input: 1. a (scalar): the continuous treatment a;
+    #        2. x (scalar): the covariate x;
+    #        3. phi (vector, dim=c(B*3+1)): the estimated values of (mu_Y(dim=1), gamma(dim=B), beta_X^Y(dim=B), delta_{A*X}(dim=B)).
+    #        4. sample_phi (boolean): if sample_phi=FALSE, calculate the expected Q-value without random sampling.
+    # Output: y (scalar): the expected Q-value.
+    
     # transfrom data to spline basis
     a_bs <- predict(a_spline, a) %*% a_trans
     x_bs <- predict(x_spline, x) %*% x_trans
@@ -150,7 +158,15 @@ for (seed_index in 1:num_seed){
   source('SGD_Functions.R')
   
   q_function_expected <- function(a, x, phi, sample_phi=F){
-    # transfrom data to spline basis
+    
+    # Calculate the expected Q-value (IPTW).
+    # Input: 1. a (scalar): the continuous treatment a;
+    #        2. x (scalar): the covariate x;
+    #        3. phi (vector, dim=c(B*3+1)): the estimated values of (mu_Y(dim=1), gamma(dim=B), beta_X^Y(dim=B), delta_{A*X}(dim=B));
+    #        4. sample_phi (boolean): if sample_phi=FALSE, calculate the expected Q-value without random sampling.
+    # Output: y (scalar): the expected Q-value.
+    
+    transfrom data to spline basis
     a_bs <- predict(a_spline, a) %*% a_trans
     xa_bs <- predict(xa_spline, x*a) %*% xa_trans
     # calculate q-value
@@ -192,6 +208,14 @@ for (seed_index in 1:num_seed){
   source('SGD_Functions.R')
   
   q_function_expected <- function(a, x, phi, sample_phi=F){
+    
+    # Calculate the expected Q-value (AIPTW).
+    # Input: 1. a (scalar): the continuous treatment a;
+    #        2. x (scalar): the covariate x;
+    #        3. phi (vector, dim=c(B*3+1)): the estimated values of (mu_Y(dim=1), gamma(dim=B), beta_X^Y(dim=B), delta_{A*X}(dim=B));
+    #        4. sample_phi (boolean): if sample_phi=FALSE, calculate the expected Q-value without random sampling.
+    # Output: y (scalar): the expected Q-value.
+    
     # transfrom data to spline basis
     a_bs <- predict(a_spline, a) %*% a_trans
     x_bs <- predict(x_spline, x) %*% x_trans
@@ -267,8 +291,15 @@ dev.off()
 ##########################################################################################
 
 q_truth <- function(a, x, max_to_min){
+  
+  # Calculate the simulated true Q-value.
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x;
+  #        3. max_to_min (boolean): if max_to_min=TRUE, convert the maximization problem to a minimization problem by negating the Q-value.
+  # Output: y (scalar): the simulated true Q-value.
+  
   # calculate q-value
-  y <- cos(a) + sin(x*a) 
+  y <- cos(a) + sin(x*a)
   if (max_to_min){ return(-y) # from max to min
   }else { return(y) }
 }

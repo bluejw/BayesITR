@@ -12,11 +12,12 @@ const double log2pi = log(2.0*M_PI);
 // [[Rcpp::export]]
 double dmvn_rcpp(rowvec& x, rowvec& mean, mat& sigma, bool logd = false){ 
   
-  // calculate density of multivariate normal distribution
-  // args: x: row vector data
-  //      mean: row vector mean, sigma: covariance matrix  
-  //      logd: true for taking log
-  // returns: out: pdf (or log pdf) of multivariate normal distribution
+  // Calculate density of the multivariate normal distribution.
+  // Input: 1. x (row vector, dim=c(xdim)): row vector data;
+  //        2. mean (row vector, dim=c(xdim)): mean of multivariate normal distribution;
+  //        3. sigma (matrix, dim=c(xdim,xdim)): covariance matrix of multivariate normal distribution;
+  //        4. logd (scalar, boolean): true for taking log.
+  // Output: out (scalar, double): pdf (or log pdf) of multivariate normal distribution.
   
   int xdim = x.size(); 
   mat rooti = trans(inv(trimatu(chol(sigma))));
@@ -31,14 +32,14 @@ double dmvn_rcpp(rowvec& x, rowvec& mean, mat& sigma, bool logd = false){
 }
 
 
-
 // [[Rcpp::export]]
 mat rmvn_rcpp(const int n, vec& mean, mat& sigma){
   
-  // randomly generate samples from multivariate normal distribution
-  // args: n: number of data 
-  //      mean: row vector mean, sigma: covariance matrix  
-  // returns: out: random samples from multivariate normal distribution
+  // Randomly generate samples from the multivariate normal distribution.
+  // Input: 1. n (scalar, integer): number of data points;
+  //        2. mean (row vector, dim=c(k)): mean of multivariate normal distribution;
+  //        3. sigma (matrix, dim=c(k,k)): covariance matrix of multivariate normal distribution.
+  // Output: out (matrix, dim=c(n,k)): n random samples from the k-dimensional multivariate normal distribution.
   
   int k = sigma.n_cols; // dimension of the multivariate normal distribution
   mat z = randn(n, k);
@@ -50,9 +51,10 @@ mat rmvn_rcpp(const int n, vec& mean, mat& sigma){
 // [[Rcpp::export]]
 double rinvgamma_rcpp(const double a, const double b){
   
-  // generate random samples from inverse-gamma distribution
-  // args: inverse-gamma(a, b)
-  // returns: random sample from inverse-gamma distribution
+  // Generate a random sample from the Inverse-Gamma distribution.
+  // Input: 1. a (scalar, double): the first parameter in Inverse-Gamma(a, b);
+  //        2. b (scalar, double): the second parameter in Inverse-Gamma(a, b).
+  // Output: a random sample from Inverse-Gamma(a,b).
   
   return(1/R::rgamma(a, 1/b));
 }
@@ -61,9 +63,10 @@ double rinvgamma_rcpp(const double a, const double b){
 // [[Rcpp::export]]
 double rinvgaussian_rcpp(const double mu, const double lambda){
   
-  // generate random samples from inverse-gaussian distribution
-  // args: inverse-gaussian(mu, lambda)
-  // returns: random sample from inverse-gaussian distribution
+  // Generate a random sample from the Inverse-Gaussian distribution.
+  // Input: 1. mu (scalar, double): the first parameter in Inverse-Gaussian(mu, lambda);
+  //        2. lambda (scalar, double): the second parameter in Inverse-Gaussian(mu, lambda).
+  // Output: out (scalar, double): a random sample from Inverse-Gaussian(mu, lambda).
   
   double out;
   double nu = R::rnorm(0, 1);
@@ -82,6 +85,27 @@ double update_eta_gamma_rcpp(vec& zeta_gamma, double xi_gamma, double nu_gamma,
                              cube& alpha, mat& beta, vec& U, vec& lambda, vec& mu, mat& tau, vec& sigma2, 
                              const int I, const int S_sum, const int B, const int P, 
                              vec& Y, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter eta_gamma in the MCMC algorithm.
+  // Input: 1. zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal;
+  //        2. xi_gamma (scalar, double): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), nu_0=2.5e-4;
+  //        3. nu_gamma (scalar, double): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and nu_gamma ~ Inverse-Gamma(a_nu, b_nu), a_nu=5, b_nu=50;
+  //        4. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        5. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        6. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        7. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        8. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        9. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        10. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        11. I (scalar, integer): the total number of individuals;
+  //        12. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        13. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        14. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        15. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        16. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        17. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        18. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: eta_gamma_update (scalar, double): the updated value of eta_gamma for the current MCMC iteration.
   
   double eta_gamma_update;
   
@@ -119,6 +143,26 @@ vec update_zeta_gamma_rcpp(double eta_gamma, vec& m_gamma,
                            cube& alpha, mat& beta, vec& U, vec& lambda, vec& mu, mat& tau, vec& sigma2, 
                            const int I, const int S_sum, const int B, const int P, 
                            vec& Y, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter zeta_gamma in the MCMC algorithm.
+  // Input: 1. eta_gamma (scalar, double): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  //        2. m_gamma (vector, dim=c(B)): the hyper-parameter in the prior for zeta_gamma, where zeta_gamma[b] ~ N(m_gamma[b], 1), for b=1,2,...,B, and m_gamma[b] ~ 0.5*Delta_{1}(m_gamma[b]) + 0.5*Delta_{-1}(m_gamma[b]);
+  //        3. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        4. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        5. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        6. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        7. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        8. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        9. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        10. I (scalar, integer): the total number of individuals;
+  //        11. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        12. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        13. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        14. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        15. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        16. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        17. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: zeta_gamma_update (vector, dim=c(B)): the updated value of zeta_gamma for the current MCMC iteration.
   
   vec zeta_gamma_update(B);
   
@@ -159,6 +203,31 @@ mat update_eta_alpha_rcpp(vec& gamma, mat& eta_alpha, cube& zeta_alpha, mat& xi_
                           mat& beta, vec& U, vec& lambda, vec& mu, mat& tau, vec& sigma2, 
                           const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                           vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
+  
+  // Update the parameter eta_alpha in the MCMC algorithm.
+  // Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        2. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  //        3. zeta_alpha (cube, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  //        4. xi_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]);
+  //        5. nu_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]), and nu_alpha[q,s] ~ Inverse-Gamma(a_nu, b_nu);
+  //        6. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        7. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        8. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        9. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        10. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        11. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        12. I (scalar, integer): the total number of individuals;
+  //        13. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        14. S (scalar, integer): the dimension of continuous covariates X;
+  //        15. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        16. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        17. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        18. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        19. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        20. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        21. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        22. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: eta_alpha_update (matrix, dim=c(Q=2, S_sum)): the updated value of eta_alpha for the current MCMC iteration.
   
   mat eta_alpha_update = eta_alpha;
   
@@ -257,6 +326,30 @@ cube update_zeta_alpha_rcpp(vec& gamma, mat& eta_alpha, cube& zeta_alpha, cube& 
                             mat& beta, vec& U, vec& lambda, vec& mu, mat& tau, vec& sigma2, 
                             const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                             vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter zeta_alpha in the MCMC algorithm.
+  // Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        2. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  //        3. zeta_alpha (cube, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  //        4. m_alpha (cube, dim=c(Q=2, S_sum, B)): the hyper-parameter in the prior for zeta_alpha, where zeta_alpha[q,s,b] ~ N(m_alpha[q,s,b], 1), for q=1,2, s=1,2,...,S_sum, and b=1,2,...,B, and m_alpha[q,s,b] ~ 0.5*Delta_{1}(m_alpha[q,s,b]) + 0.5*Delta_{-1}(m_alpha[q,s,b]);
+  //        5. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        6. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        7. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        8. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        9. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        10. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        11. I (scalar, integer): the total number of individuals;
+  //        12. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        13. S (scalar, integer): the dimension of continuous covariates X;
+  //        14. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        15. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        16. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        17. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        18. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        19. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        20. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        21. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: zeta_alpha_update (cube, dim=c(Q=2, S_sum, B)): the updated value of zeta_alpha for the current MCMC iteration.
   
   cube zeta_alpha_update = zeta_alpha;
   
@@ -362,6 +455,29 @@ mat update_beta_rcpp(mat& xi_beta, mat& nu_beta, vec& gamma, cube& alpha,
                      vec& U, vec& lambda, vec& mu, mat& tau, vec& sigma2,
                      const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                      vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter beta in the MCMC algorithm.
+  // Input: 1. xi_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]);
+  //        2. nu_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and nu_beta[q,p] ~ Inverse-Gamma(a_nu, b_nu), for q=1,2, and p=1,2,...,P;
+  //        3. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        4. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        5. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        6. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        7. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        8. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        9. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        10. I (scalar, integer): the total number of individuals;
+  //        11. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        12. S (scalar, integer): the dimension of continuous covariates X;
+  //        13. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        14. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        15. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        16. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        17. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        18. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        19. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        20. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: beta_update (matrix, dim=c(Q=2, P)): the updated value of beta for the current MCMC iteration.
   
   mat beta_update(Q, P);
   
@@ -424,6 +540,27 @@ mat update_beta_rcpp(mat& xi_beta, mat& nu_beta, vec& gamma, cube& alpha,
 vec update_U_rcpp(vec& gamma, cube& alpha, mat& beta, vec& lambda, vec& mu, mat& tau, vec& sigma2, 
                   const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                   vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter U in the MCMC algorithm.
+  // Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        2. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        4. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        5. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        6. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        8. I (scalar, integer): the total number of individuals;
+  //        9. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        10. S (scalar, integer): the dimension of continuous covariates X;
+  //        11. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        12. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        13. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        14. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        15. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        16. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        17. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        18. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: U_update (vector, dim=c(I)): the updated value of U for the current MCMC iteration.
   
   vec U_update(I);
   
@@ -471,6 +608,27 @@ vec update_U_rcpp(vec& gamma, cube& alpha, mat& beta, vec& lambda, vec& mu, mat&
 vec update_lambda_rcpp(vec& gamma, cube& alpha, mat& beta, vec& U, vec& mu, mat& tau, vec& sigma2, 
                        const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                        vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
+    
+  // Update the parameter lambda in the MCMC algorithm.
+  // Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        2. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        5. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        6. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  //        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        8. I (scalar, integer): the total number of individuals;
+  //        9. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        10. S (scalar, integer): the dimension of continuous covariates X;
+  //        11. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        12. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        13. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        14. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        15. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        16. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        17. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        18. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: lambda_update (vector, dim=c(I)): the updated value of lambda for the current MCMC iteration.
   
   vec lambda_update(Q);
   
@@ -532,7 +690,28 @@ vec update_lambda_rcpp(vec& gamma, cube& alpha, mat& beta, vec& U, vec& mu, mat&
 mat update_tau_rcpp(vec& gamma, cube& alpha, mat& beta, vec& U, vec& lambda, vec& mu, vec& sigma2,
                     const int I, const int Q, const int S, const int S_sum, const int B, const int P,
                     vec& Y, vec& A, mat& A_bs, cube& X_bs, mat& Z){
-  
+    
+  // Update the parameter tau in the MCMC algorithm.
+  // Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  //        2. alpha (cube, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  //        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  //        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  //        5. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  //        6. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  //        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1;
+  //        8. I (scalar, integer): the total number of individuals;
+  //        9. Q (scalar, integer): the number of outcome and treatment, where Q=2;
+  //        10. S (scalar, integer): the dimension of continuous covariates X;
+  //        11. S_sum (scalar, integer): S_sum=S*2+P, where S and P denote the dimensions of continuous and discrete covariates X and Z, respectively;
+  //        12. B (scalar, integer): the degrees of freedom B=B0-1 for the cubic B-spline expansion after imposing the sum-to-zero constraint;
+  //        13. P (scalar, integer): the dimension of the discrete covariates Z;
+  //        14. Y (vector, dim=c(I)): the outcome vector, where Y[i] denotes the value for individual i, i=1,2,...,I;
+  //        15. A (vector, dim=c(I)): the treatment vector, where A[i] denotes the value for individual i, i=1,2,...,I;
+  //        16. A_bs (matrix, dim=c(I, B)): the cubic B-spline expansion for the treatment A, where A_bs[i,] denotes the vector value for individual i, i=1,2,...,I;
+  //        17. X_bs (cube, dim=c(I, S_sum, B)): the cubic B-spline expansion for the continuous covariates and interactions, where X_bs[i,s,] denotes the vector value for individual i and covariate s, i=1,2,...,I, s=1,2,...,S_sum;
+  //        18. Z (matrix, dim=c(I, P)): the discrete covariates Z, where Z[i,p] denotes the value for individual i and discrete covariate p, i=1,2,...,I, p=1,2,...,P.
+  // Output: tau_update (matrix, dim=c(I, Q=2)): the updated value of tau for the current MCMC iteration.
+    
   mat tau_update(I,Q);
   double eps = 1e-3; // avoid numerical issues
   
