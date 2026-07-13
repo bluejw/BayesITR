@@ -138,12 +138,6 @@ for (B0_index in 3:10){
     mcmc$m_alpha[nit,,,] <- update_m_alpha(mcmc$zeta_alpha[nit,,,])
     
     # update beta
-    # mcmc$beta[nit,,] <- update_beta_rcpp(mcmc$xi_beta[nit-1,,], mcmc$nu_beta[nit-1,,], mcmc$gamma[nit,], mcmc$alpha[nit,,,],
-    #                                      mcmc$U[nit-1,], mcmc$lambda[nit-1,], mcmc$mu[nit-1,], mcmc$tau[nit-1,,], mcmc$sigma2[nit-1,],
-    #                                      I, Q, S, S_sum, B, P, Y, A, A_bs, X_bs, Z)
-    # mcmc$xi_beta[nit,,] <- update_xi_beta(mcmc$beta[nit,,], mcmc$nu_beta[nit-1,,], mcmc$rho_beta[nit-1])
-    # mcmc$nu_beta[nit,,] <- update_nu_beta(mcmc$beta[nit,,], mcmc$xi_beta[nit,,])
-    # mcmc$rho_beta[nit] <- update_rho_beta(mcmc$xi_beta[nit,,])
     mcmc$beta[nit,,] <- 0
     
     # update U and lambda
