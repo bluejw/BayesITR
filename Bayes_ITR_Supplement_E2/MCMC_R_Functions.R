@@ -1,10 +1,34 @@
-################################################## Simulation Functions ###########################################
-
+################################################## MCMC Functions ###########################################
 
 init <- function(){
   
-  # MCMC initialization 
-  # initialize parameters need to be estimated in MCMC
+  # Initialize all parameters to be estimated in the MCMC algorithm.
+  # Input: NULL.
+  # Output: init_list (list), which includes the following 23 parameters with their initial MCMC values:
+  # 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  # 2. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  # 3. zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal;
+  # 4. xi_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), nu_0=2.5e-4;
+  # 5. nu_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and nu_gamma ~ Inverse-Gamma(a_nu, b_nu), a_nu=5, b_nu=50;
+  # 6. rho_gamma (scalar): the hyper-parameter in the prior for xi_gamma, where xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), and rho_gamma ~ Beta(a_rho, b_rho), a_rho=b_rho=0.5;
+  # 7. m_gamma (vector, dim=c(B)): the hyper-parameter in the prior for zeta_gamma, where zeta_gamma[b] ~ N(m_gamma[b], 1), for b=1,2,...,B, and m_gamma[b] ~ 0.5*Delta_{1}(m_gamma[b]) + 0.5*Delta_{-1}(m_gamma[b]);
+  # 8. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  # 9. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal (i.e., non-zero values) or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  # 10. zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  # 11. xi_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]);
+  # 12. nu_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]), and nu_alpha[q,s] ~ Inverse-Gamma(a_nu, b_nu);
+  # 13. rho_alpha (scalar): the hyper-parameter in the prior for xi_alpha, where xi_alpha[q,s] ~ rho_alpha*Delta_{1}(xi_alpha[q,s]) + (1-rho_alpha)*Delta_{nu_0}(xi_alpha[q,s]), and rho_alpha ~ Beta(a_rho, b_rho);
+  # 14. m_alpha (array, dim=c(Q=2, S_sum, B)): the hyper-parameter in the prior for zeta_alpha, where zeta_alpha[q,s,b] ~ N(m_alpha[q,s,b], 1), for q=1,2, s=1,2,...,S_sum, and b=1,2,...,B, and m_alpha[q,s,b] ~ 0.5*Delta_{1}(m_alpha[q,s,b]) + 0.5*Delta_{-1}(m_alpha[q,s,b]);
+  # 15. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  # 16. xi_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]);
+  # 17. nu_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and nu_beta[q,p] ~ Inverse-Gamma(a_nu, b_nu), for q=1,2, and p=1,2,...,P;
+  # 18. rho_beta (scalar): the hyper-parameter in the prior for xi_beta, where xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]), and rho_beta ~ Beta(a_rho, b_rho);
+  # 19. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  # 20. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  # 21. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  # 22. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  # 23. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Note: the quantities B0, zeta_gamma, xi_gamma, alpha[1,,], alpha[2,,], zeta_alpha, xi_alpha, and xi_beta correspond, respectively, to the notations L, xi_gamma, zeta_gamma, (beta_X^Y(dim=c(S*B)), delta_{A*X}(dim=c(S*B)), delta_{A*Z}(dim=c(P*B))), (beta_X^A(dim=c(S*B)), 0(dim=c(S*B)), 0(dim=c(P*B))), xi_alpha, zeta_alpha, and zeta_beta used in the manuscript.
   
   gamma_init <- array(NA, dim=c(B))
   eta_gamma_init <- NA
@@ -74,6 +98,19 @@ init <- function(){
 
 
 update_eta_gamma <- function(zeta_gamma, xi_gamma, nu_gamma, alpha, beta, U, lambda, mu, tau, sigma2){
+    
+  # Update the parameter eta_gamma in the MCMC algorithm.
+  # Input: 1. zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal;
+  #        2. xi_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), nu_0=2.5e-4;
+  #        3. nu_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and nu_gamma ~ Inverse-Gamma(a_nu, b_nu), a_nu=5, b_nu=50;
+  #        4. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        5. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        6. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        7. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        8. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        9. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        10. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: eta_gamma_update (scalar): the updated value of eta_gamma for the current MCMC iteration.
   
   # calculate A_sum and Ay_sum
   A_sum <- t(A_bs%*%zeta_gamma)%*%diag(tau[,1])%*%(A_bs%*%zeta_gamma)
@@ -91,6 +128,18 @@ update_eta_gamma <- function(zeta_gamma, xi_gamma, nu_gamma, alpha, beta, U, lam
 
 
 update_zeta_gamma <- function(eta_gamma, m_gamma, alpha, beta, U, lambda, mu, tau, sigma2){
+    
+  # Update the parameter zeta_gamma in the MCMC algorithm.
+  # Input: 1. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  #        2. m_gamma (vector, dim=c(B)): the hyper-parameter in the prior for zeta_gamma, where zeta_gamma[b] ~ N(m_gamma[b], 1), for b=1,2,...,B, and m_gamma[b] ~ 0.5*Delta_{1}(m_gamma[b]) + 0.5*Delta_{-1}(m_gamma[b]);
+  #        3. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        4. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        5. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        6. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        7. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        8. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        9. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: zeta_gamma_update (vector, dim=c(B)): the updated value of zeta_gamma for the current MCMC iteration.
   
   # calculate A_sum and Ay_sum
   A_sum <- t(A_bs*eta_gamma)%*%diag(tau[,1])%*%(A_bs*eta_gamma)
@@ -108,6 +157,12 @@ update_zeta_gamma <- function(eta_gamma, m_gamma, alpha, beta, U, lambda, mu, ta
 
 
 update_xi_gamma <- function(eta_gamma, nu_gamma, rho_gamma){
+    
+  # Update the parameter xi_gamma in the MCMC algorithm.
+  # Input: 1. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  #        2. nu_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and nu_gamma ~ Inverse-Gamma(a_nu, b_nu), a_nu=5, b_nu=50;
+  #        3. rho_gamma (scalar): the hyper-parameter in the prior for xi_gamma, where xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), and rho_gamma ~ Beta(a_rho, b_rho), a_rho=b_rho=0.5.
+  # Output: xi_gamma_update (scalar): the updated value of xi_gamma for the current MCMC iteration.
   
   # prob = pr(xi_gamma=1) / pr(xi_gamma=nu_0)
   prob <- (sqrt(nu_0)*rho_gamma)/(1-rho_gamma)*exp((1-nu_0)*eta_gamma^2/(2*nu_0*nu_gamma))
@@ -119,6 +174,11 @@ update_xi_gamma <- function(eta_gamma, nu_gamma, rho_gamma){
 
 
 update_nu_gamma <- function(eta_gamma, xi_gamma){
+    
+  # Update the parameter nu_gamma in the MCMC algorithm.
+  # Input: 1. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  #        2. xi_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), nu_0=2.5e-4.
+  # Output: nu_gamma_update (scalar): the updated value of nu_gamma for the current MCMC iteration.
   
   a_nu_star <- a_nu + 1/2
   b_nu_star <- b_nu + eta_gamma^2/(2*xi_gamma)
@@ -129,6 +189,10 @@ update_nu_gamma <- function(eta_gamma, xi_gamma){
 
 
 update_rho_gamma <- function(xi_gamma){
+    
+  # Update the parameter rho_gamma in the MCMC algorithm.
+  # Input: xi_gamma (scalar): the hyper-parameter in the prior for eta_gamma, where eta_gamma ~ N(0, xi_gamma*nu_gamma), and xi_gamma ~ rho_gamma*Delta_{1}(xi_gamma) + (1-rho_gamma)*Delta_{nu_0}(xi_gamma), nu_0=2.5e-4.
+  # Ouput: rho_gamma_update (scalar): the updated value of rho_gamma for the current MCMC iteration.
   
   a_rho_star <- a_rho + sum(xi_gamma == 1)
   b_rho_star <- b_rho + sum(xi_gamma == nu_0)
@@ -139,6 +203,10 @@ update_rho_gamma <- function(xi_gamma){
 
 
 update_m_gamma <- function(zeta_gamma){
+    
+  # Update the parameter m_gamma in the MCMC algorithm.
+  # Input: zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal.
+  # Output: m_gamma_update (vector, dim=c(B)): the updated value of m_gamma for the current MCMC iteration.
   
   m_gamma_update <- rep(NA, B)
   for (b in 1:B){
@@ -152,6 +220,14 @@ update_m_gamma <- function(zeta_gamma){
 
 
 update_gamma <- function(eta_gamma, zeta_gamma){
+    
+  # Update the parameter gamma in the MCMC algorithm.
+  # Input: 1. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  #        2. zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal.
+  # Output: returnlist(list), which includes the following 3 parameters with their updated values for the current MCMC iteration:
+  #         1. eta_gamma (scalar): the spike-and-slab prior hyper-parameter that indicates whether gamma is selected as a signal (i.e., non-zero values) or not, where gamma=eta_gamma*zeta_gamma;
+  #         2. zeta_gamma (vector, dim=c(B)): the spike-and-slab prior hyper-parameter that represents the magnitude of gamma if it is selected as a signal;
+  #         3. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint.
   
   eta_gamma_update <- eta_gamma
   zeta_gamma_update <- zeta_gamma
@@ -171,6 +247,20 @@ update_gamma <- function(eta_gamma, zeta_gamma){
 
 
 update_eta_alpha <- function(gamma, eta_alpha, zeta_alpha, xi_alpha, nu_alpha, beta, U, lambda, mu, tau, sigma2){
+    
+  # Update the parameter eta_alpha in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        3. zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  #        4. xi_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]);
+  #        5. nu_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]), and nu_alpha[q,s] ~ Inverse-Gamma(a_nu, b_nu);
+  #        6. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        7. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        8. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        9. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        10. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        11. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: eta_alpha_update (matrix, dim=c(Q=2, S_sum)): the updated value of eta_alpha for the current MCMC iteration.
   
   eta_alpha_update <- eta_alpha
   
@@ -206,6 +296,19 @@ update_eta_alpha <- function(gamma, eta_alpha, zeta_alpha, xi_alpha, nu_alpha, b
 
 
 update_zeta_alpha <- function(gamma, eta_alpha, zeta_alpha, m_alpha, beta, U, lambda, mu, tau, sigma2){
+    
+  # Update the parameter zeta_alpha in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        3. zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  #        4. m_alpha (array, dim=c(Q=2, S_sum, B)): the hyper-parameter in the prior for zeta_alpha, where zeta_alpha[q,s,b] ~ N(m_alpha[q,s,b], 1), for q=1,2, s=1,2,...,S_sum, and b=1,2,...,B, and m_alpha[q,s,b] ~ 0.5*Delta_{1}(m_alpha[q,s,b]) + 0.5*Delta_{-1}(m_alpha[q,s,b]);
+  #        5. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        6. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        7. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        8. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        9. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        10. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: zeta_alpha_update (array, dim=c(Q=2, S_sum, B)): the updated value of zeta_alpha for the current MCMC iteration.
   
   zeta_alpha_update <- zeta_alpha
   
@@ -241,8 +344,14 @@ update_zeta_alpha <- function(gamma, eta_alpha, zeta_alpha, m_alpha, beta, U, la
 
 
 update_xi_alpha <- function(eta_alpha, nu_alpha, rho_alpha){
+    
+  # Update the parameter xi_alpha in the MCMC algorithm.
+  # Input: 1. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        2. nu_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]), and nu_alpha[q,s] ~ Inverse-Gamma(a_nu, b_nu);
+  #        3. rho_alpha (scalar): the hyper-parameter in the prior for xi_alpha, where xi_alpha[q,s] ~ rho_alpha*Delta_{1}(xi_alpha[q,s]) + (1-rho_alpha)*Delta_{nu_0}(xi_alpha[q,s]), and rho_alpha ~ Beta(a_rho, b_rho).
+  # Output: xi_alpha_update (matrix, dim=c(Q=2, S_sum)): the updated value of xi_alpha for the current MCMC iteration.
   
-  xi_alpha_update <- matrix(NA, nrow=Q, ncol=S_sum) 
+  xi_alpha_update <- matrix(NA, nrow=Q, ncol=S_sum)
   
   for (q in 1:Q){
     for (s in 1:S_sum){
@@ -258,8 +367,13 @@ update_xi_alpha <- function(eta_alpha, nu_alpha, rho_alpha){
 
 
 update_nu_alpha <- function(eta_alpha, xi_alpha){
+    
+  # Update the parameter nu_alpha in the MCMC algorithm.
+  # Input: 1. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        2. xi_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]).
+  # Output: nu_alpha_update (matrix, dim=c(Q=2, S_sum)): the updated value of nu_alpha for the current MCMC iteration.
   
-  nu_alpha_update <- matrix(NA, nrow=Q, ncol=S_sum) 
+  nu_alpha_update <- matrix(NA, nrow=Q, ncol=S_sum)
   
   for (q in 1:Q){
     for (s in 1:S_sum){
@@ -274,6 +388,10 @@ update_nu_alpha <- function(eta_alpha, xi_alpha){
 
 
 update_rho_alpha <- function(xi_alpha){
+    
+  # Update the parameter rho_alpha in the MCMC algorithm.
+  # Input: xi_alpha (matrix, dim=c(Q=2, S_sum)): the hyper-parameter in the prior for eta_alpha, where eta_alpha[q,s] ~ N(0, xi_alpha[q,s]*nu_alpha[q,s]).
+  # Output: rho_alpha_update (scalar): the updated value of rho_alpha for the current MCMC iteration.
   
   a_rho_star <- a_rho + sum(xi_alpha == 1)
   b_rho_star <- b_rho + sum(xi_alpha == nu_0)
@@ -284,6 +402,10 @@ update_rho_alpha <- function(xi_alpha){
 
 
 update_m_alpha <- function(zeta_alpha){
+    
+  # Update the parameter m_alpha in the MCMC algorithm.
+  # Input: zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal.
+  # Output: m_alpha_update (array, dim=c(Q=2, S_sum, B)): the updated value of m_alpha for the current MCMC iteration.
   
   m_alpha_update <-  array(NA, dim=c(Q, S_sum, B))
   
@@ -302,6 +424,14 @@ update_m_alpha <- function(zeta_alpha){
 
 
 update_alpha <- function(eta_alpha, zeta_alpha){
+    
+  # Update the parameter alpha in the MCMC algorithm.
+  # Input: 1. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        2. zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal.
+  # Output: returnlist (list), which includes the following 3 parameters with their updated values for the current MCMC iteration:
+  #        1. eta_alpha (matrix, dim=c(Q=2, S_sum)): eta_alpha[q,s] indicates whether alpha[q,s,] is selected as a signal or not, where alpha[q,s,]=eta_alpha[q,s]*zeta_alpha[q,s,], for q=1,2 and s=1,2,...,S_sum;
+  #        2. zeta_alpha (array, dim=c(Q=2, S_sum, B)): zeta_alpha[q,s,] represents the magnitude of alpha[q,s,] if it is selected as a signal;
+  #        3. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively.
   
   eta_alpha_update <- eta_alpha
   zeta_alpha_update <- zeta_alpha
@@ -332,8 +462,20 @@ update_alpha <- function(eta_alpha, zeta_alpha){
 
 
 update_beta <- function(xi_beta, nu_beta, gamma, alpha, U, lambda, mu, tau, sigma2){
+    
+  # Update the parameter beta in the MCMC algorithm.
+  # Input: 1. xi_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]);
+  #        2. nu_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and nu_beta[q,p] ~ Inverse-Gamma(a_nu, b_nu), for q=1,2, and p=1,2,...,P;
+  #        3. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        4. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        5. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        6. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        7. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        8. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        9. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: beta_update (matrix, dim=c(Q=2, P)): the updated value of beta for the current MCMC iteration.
   
-  beta_update <- matrix(NA, nrow=Q, ncol=P) 
+  beta_update <- matrix(NA, nrow=Q, ncol=P)
   
   # calculate mu_m and V_m
   Sigma_inv <- diag(tau[,1]/sigma2[1]) 
@@ -362,8 +504,14 @@ update_beta <- function(xi_beta, nu_beta, gamma, alpha, U, lambda, mu, tau, sigm
 
 
 update_xi_beta <- function(beta, nu_beta, rho_beta){
+    
+  # Update the parameter xi_beta in the MCMC algorithm.
+  # Input: 1. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        2. nu_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and nu_beta[q,p] ~ Inverse-Gamma(a_nu, b_nu), for q=1,2, and p=1,2,...,P;
+  #        3. rho_beta (scalar): the hyper-parameter in the prior for xi_beta, where xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]), and rho_beta ~ Beta(a_rho, b_rho).
+  # Output: xi_beta_update (matrix, dim=c(Q=2, P)): the updated value of xi_beta for the current MCMC iteration.
   
-  xi_beta_update <- matrix(NA, nrow=Q, ncol=P) 
+  xi_beta_update <- matrix(NA, nrow=Q, ncol=P)
   
   for (q in 1:Q){
     for (p in 1:P){
@@ -379,8 +527,13 @@ update_xi_beta <- function(beta, nu_beta, rho_beta){
 
 
 update_nu_beta <- function(beta, xi_beta){
+    
+  # Update the parameter nu_beta in the MCMC algorithm.
+  # Input: 1. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        2. xi_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]).
+  # Output: nu_beta_update (matrix, dim=c(Q=2, P)): the updated value of nu_beta for the current MCMC iteration.
   
-  nu_beta_update <- matrix(NA, nrow=Q, ncol=P) 
+  nu_beta_update <- matrix(NA, nrow=Q, ncol=P)
   
   for (q in 1:Q){
     for (p in 1:P){
@@ -395,6 +548,10 @@ update_nu_beta <- function(beta, xi_beta){
 
 
 update_rho_beta <- function(xi_beta){
+    
+  # Update the parameter rho_beta in the MCMC algorithm.
+  # Input: xi_beta (matrix, dim=c(Q=2, P)): the hyper-parameter in the prior for beta, where beta[q,p] ~ N(0, xi_beta[q,p]*nu_beta[q,p]), and xi_beta[q,p] ~ rho_beta*Delta_{1}(xi_beta[q,p]) + (1-rho_beta)*Delta_{nu_0}(xi_beta[q,p]).
+  # Output: rho_beta_update (scalar): the updated value of rho_beta for the current MCMC iteration.
   
   a_rho_star <- a_rho + sum(xi_beta == 1)
   b_rho_star <- b_rho + sum(xi_beta == nu_0)
@@ -405,6 +562,16 @@ update_rho_beta <- function(xi_beta){
 
 
 update_U <- function(gamma, alpha, beta, lambda, mu, tau, sigma2){
+    
+  # Update the parameter U in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        4. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        5. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        6. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: U_update (vector, dim=c(I)): the updated value of U for the current MCMC iteration.
   
   U_update <- rep(NA, I)
   
@@ -430,6 +597,16 @@ update_U <- function(gamma, alpha, beta, lambda, mu, tau, sigma2){
 
 
 update_lambda <- function(gamma, alpha, beta, U, mu, tau, sigma2){
+    
+  # Update the parameter lambda in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        5. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        6. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: lambda_update (vector, dim=c(Q=2)): the updated value of lambda for the current MCMC iteration.
   
   lambda_update <- rep(NA, Q)
   
@@ -453,16 +630,21 @@ update_lambda <- function(gamma, alpha, beta, U, mu, tau, sigma2){
   # Gaussian posterior distribution
   lambda_update[2] <- rnorm(1, mu_n, sqrt(V_n))
   
-  # Gaussian posterior distribution
-  # mu_mn <- c(mu_m, mu_n); V_mn <- diag(c(V_m, V_n))
-  # if (trunc_norm){ lambda_update <- rtmvnorm(n=1, mu=mu_mn, sigma=V_mn, lb=rep(0,Q), ub=rep(Inf,Q))
-  # }else{ lambda_update <- rmvn_rcpp(1, mu_mn, V_mn) }
-  
   return(lambda_update)
 }
 
 
 update_mu <- function(gamma, alpha, beta, U, lambda, tau, sigma2){
+    
+  # Update the parameter mu in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        5. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        6. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I;
+  #        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: mu_update (vector, dim=c(Q=2)): the updated value of mu for the current MCMC iteration.
   
   mu_update <- rep(NA, Q)
   
@@ -489,8 +671,18 @@ update_mu <- function(gamma, alpha, beta, U, lambda, tau, sigma2){
 
 
 update_tau <- function(gamma, alpha, beta, U, lambda, mu, sigma2){
+    
+  # Update the parameter tau in the MCMC algorithm.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+  #        5. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        6. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        7. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: tau_update (matrix, dim=c(I, Q=2)): the updated value of tau for the current MCMC iteration.
   
-  tau_update <- matrix(NA, nrow=I, ncol=Q) 
+  tau_update <- matrix(NA, nrow=I, ncol=Q)
   eps <- 1e-3 # avoid numerical issues
   
   Y_tilde <- Y - mu[1] - lambda[1]*U - A_bs%*%gamma - Z%*%beta[1,]
@@ -512,7 +704,17 @@ update_tau <- function(gamma, alpha, beta, U, lambda, mu, sigma2){
 
 
 update_sigma2 <- function(gamma, alpha, beta, U, lambda, mu, tau){
-  
+    
+   # Update the parameter sigma2 in the MCMC algorithm.
+   # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+   #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+   #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+   #        4. U (vector, dim=c(I)): the unmeasured confounder vector, where U[i] denotes the value for individual i, i=1,2,...,I, and I denotes the total number of individuals;
+   #        5. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+   #        6. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+   #        7. tau (matrix, dim=c(I, Q=2)): the auxiliary variable associated with the Laplace error term for Y (q=1) and A (q=2), where tau[i,1] and tau[i,2] ~ Inverse-Gamma(1, 1/8) for individual i, i=1,2,...,I.
+   # Output: sigma2_update (vector, dim=c(Q=2)): the updated value of sigma2 for the current MCMC iteration.
+   
   sigma2_update <- rep(NA, Q)
   
   Y_tilde <- Y - mu[1] - lambda[1]*U - A_bs%*%gamma - Z%*%beta[1,]
@@ -534,4 +736,36 @@ update_sigma2 <- function(gamma, alpha, beta, U, lambda, mu, tau){
   sigma2_update[2] <- rinvgamma(1, a_star, b_star)
   
   return(sigma2_update)
+}
+
+
+log_likelihood <- function(gamma, alpha, beta, lambda, mu, sigma2){
+    
+  # Calculate the log-likelihood.
+  # Input: 1. gamma (vector, dim=c(B)): the estimated treatment effect of A on Y using cubic B-spline expansion, where the degrees of freedom B=B0-1 after imposing the sum-to-zero constraint;
+  #        2. alpha (array, dim=c(Q=2, S_sum, B)): the estimated effects of the continuous covariates X, and the interactions of both the continuous and discrete covariates X and Z with the continuous treatment A (i.e., A*X and A*Z) on the outcome Y (q=1) and the treatment A (q=2) using cubic B-spline expansions, where S_sum=S*2+P, S and P denote the dimensions of X and Z, respectively;
+  #        3. beta (matrix, dim=c(Q=2, P)): the estimated effects of the discrete covariates Z on Y (q=1) and A (q=2);
+  #        4. lambda (vector, dim=c(Q=2)): the effects of unmeasured confounder U on the outcome Y (q=1) and the treatment A (q=2);
+  #        5. mu (vector, dim=c(Q=2)): the global intercept terms for the outcome Y (q=1) and the treatment A (q=2);
+  #        6. sigma2 (vector, dim=c(Q=2)): the variance of the Laplace error term for Y (q=1) and A (q=2), where sigma2 ~ Inverse-Gamma(a_sigma, b_sigma), a_sigma=b_sigma=1.
+  # Output: logll (scalar): log-likelihood.
+  
+  niter <- 100 # number of samples for latent variables
+  ll <- matrix(1, nrow=niter, ncol=I) # likelihood matrix
+  
+  for (iter in 1:niter){
+    
+    U <- rnorm(I, 0, 1)
+    
+    Y_mean <- mu[1] + lambda[1]*U + A_bs%*%gamma + Z%*%beta[1,]
+    for (s in 1:S_sum){ Y_mean <- Y_mean + X_bs[,s,]%*%alpha[1,s,] }
+    ll[iter,] <- ll[iter,] * dlaplace(Y, location=Y_mean, scale=2*sqrt(sigma2[1]))
+    
+    A_mean <- mu[2] + lambda[2]*U + Z%*%beta[2,]
+    for (s in 1:S){ A_mean <- A_mean + X_bs[,s,]%*%alpha[2,s,] }
+    ll[iter,] <- ll[iter,] * dlaplace(A, location=A_mean, scale=2*sqrt(sigma2[2]))
+  }
+  
+  logll <- sum(log(colMeans(ll)))
+  return(logll)
 }
