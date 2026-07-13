@@ -41,6 +41,10 @@ xa_lower <- min(X[,S*2+1]); xa_upper <- max(X[,S*2+1])
 
 # conservative q-function
 q_function_conservative <- function(a, x){
+  # Calculate the conservative Q-value (Proposed Method).
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x.
+  # Output: y_min (scalar): the conservative Q-value.
   # transfrom data to spline basis
   a_bs <- predict(a_spline, a) %*% a_trans
   xa_bs <- predict(xa_spline, x*a) %*% xa_trans
@@ -152,6 +156,10 @@ dev.off()
 
 # NonCons 
 q_function_expected <- function(a, x){
+  # Calculate the expected Q-value using posterior samples (NonCons Method).
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x.
+  # Output: y (scalar): the expected Q-value.
   # transfrom data to spline basis
   a_bs <- predict(a_spline, a) %*% a_trans
   xa_bs <- predict(xa_spline, x*a) %*% xa_trans
@@ -195,6 +203,10 @@ phi_all <- lm(Y~A_bs+X_bs[,1,]+X_bs[,2,]+X_bs[,3,]+X_bs[,S+1,]+X_bs[,S+2,]+X_bs[
                 X_bs[,S*2+1,]+X_bs[,S*2+2,]+Z[,1]+Z[,2])$coef
 phi <- phi_all[c(1,2:4,23:25)]
 q_function_expected <- function(a, x){
+  # Calculate the expected Q-value using the point estimate (Q-Learning).
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x.
+  # Output: y (scalar): the expected Q-value.
   # transfrom data to spline basis
   a_bs <- predict(a_spline, a) %*% a_trans
   xa_bs <- predict(xa_spline, x*a) %*% xa_trans
@@ -218,6 +230,10 @@ outcome.model <- lm(Y~A_bs+X_bs[,S+1,]+X_bs[,S+2,]+X_bs[,S+3,]+
 phi_all <- outcome.model$coef
 phi <- phi_all[c(1,2:4,14:16)]
 q_function_expected <- function(a, x){
+  # Calculate the expected Q-value using the point estimate (IPTW).
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x.
+  # Output: y (scalar): the expected Q-value.
   # transfrom data to spline basis
   a_bs <- predict(a_spline, a) %*% a_trans
   xa_bs <- predict(xa_spline, x*a) %*% xa_trans
@@ -241,6 +257,10 @@ outcome.model <- lm(Y~A_bs+X_bs[,1,]+X_bs[,2,]+X_bs[,3,]+X_bs[,S+1,]+X_bs[,S+2,]
 phi_all <- outcome.model$coef
 phi <- phi_all[c(1,2:4,23:25)]
 q_function_expected <- function(a, x){
+  # Calculate the expected Q-value using the point estimate (AIPTW).
+  # Input: 1. a (scalar): the continuous treatment a;
+  #        2. x (scalar): the covariate x.
+  # Output: y (scalar): the expected Q-value.
   # transfrom data to spline basis
   a_bs <- predict(a_spline, a) %*% a_trans
   xa_bs <- predict(xa_spline, x*a) %*% xa_trans

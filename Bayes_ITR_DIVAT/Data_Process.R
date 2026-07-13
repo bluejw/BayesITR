@@ -11,11 +11,11 @@ A <- rep(NA, I) # treatment
 X <- matrix(NA, nrow=I, ncol=S_sum) # continuous covariates (include continuous interactions)
 Z <- matrix(NA, nrow=I, ncol=P) # binary covariates
 
-Y <- as.vector(scale(data$creat))
-A <- as.vector(scale(data$tacro_tl))
-X[,1:3] <- cbind(scale(data$ageR),scale(data$bmiR),scale(data$ageD))
-Z[,1:2] <- cbind(data$DGF,data$typeDonor)
-X[,(S+1):S_sum] <- cbind(A*X[,1],A*X[,2],A*X[,3],A*Z[,1],A*Z[,2])
+Y <- as.vector(scale(data$creat)) # creatinine level
+A <- as.vector(scale(data$tacro_tl)) # dosage of tacrolimus
+X[,1:3] <- cbind(scale(data$ageR),scale(data$bmiR),scale(data$ageD)) # recipient age, recipient BMI, donor age
+Z[,1:2] <- cbind(data$DGF,data$typeDonor) # delayed graft function, donor type
+X[,(S+1):S_sum] <- cbind(A*X[,1],A*X[,2],A*X[,3],A*Z[,1],A*Z[,2]) # interaction terms
 
 # spline expansion
 B0 <- 4 # dimension of the spline expansion
